@@ -8,6 +8,8 @@ const OTP = require("../model/otp");
 const {sendmail,sendrestpass} = require("../config/smtp");
 const otphtml = require("../config/otpTemplate");
 const resetTemplate = require("../config/linkreset");
+const upload = require("../config/multer");
+const cloudinary = require("../config/cloudinary");
 
 routes.post("/signup", async (req, res) => {
   try {
@@ -236,23 +238,34 @@ routes.post("/changepassowrd", auth, async (req, res) => {
 
 
 //add multer and cloudinary and this setup okay 
-routes.post("/uploadprofile", auth, async(req,res)=>{
+routes.post("/uploadprofile", auth, upload.single("profile"), async (req, res) => {
   try {
     const userId = req.user._id;
-const user = await User.findById(userId);
-if(!user){
-return res.json({message:"User not found!!"})
-}
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ message: "User not found!!" });
+    }
 
- user.profileImg = req.file.filename;
-await user.save();
-res.json({message:"Profile Image uplod Succfully!!"});
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const fileBase64 = req.file.buffer.toString("base64");
+    const dataUri = `data:${req.file.mimetype};base64,${fileBase64}`;
+    const uploadResult = await cloudinary.uploader.upload(dataUri, {
+      folder: "chat_profiles",
+      resource_type: "image"
+    });
+
+    user.profilePhoto = uploadResult.secure_url;
+    user.profileImg = uploadResult.secure_url;
+    await user.save();
+
+    res.json({ message: "Profile Image upload successfully!!", profilePhoto: user.profilePhoto });
   } catch (error) {
-    res.json({ message: "error", error });
+    res.status(500).json({ message: "error", error });
   }
-
-
-})
+});
 
 
 routes.get("/me",auth, async(req,res)=>{

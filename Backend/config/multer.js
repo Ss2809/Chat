@@ -1,8 +1,6 @@
-const multer = require("multer")
+const multer = require("multer");
 
 const storage = multer.memoryStorage();
-const upload = multer({uplod});
+const upload = multer({ storage });
 
 module.exports = upload;
-
-//create api login

@@ -86,7 +86,7 @@ export default function Profile() {
         {/* Profile Photo */}
         <div className="flex flex-col items-center mb-6">
           <img
-            src={user?.profileImg || avatarPlaceholder}
+            src={user?.profilePhoto || avatarPlaceholder}
             className="w-28 h-28 rounded-full object-cover mb-3 ring-2 ring-teal-400/40 shadow-lg shadow-teal-500/20"
           />
           <input
