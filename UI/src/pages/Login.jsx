@@ -15,7 +15,7 @@ export default function Login() {
       setLoading(true);
       setErrorMessage("");
 
-      const res = await axios.post("http://localhost:8000/api/user/login", {
+      const res = await axios.post("https://chat-vxd8.onrender.com/api/user/login", {
         username,
         password,
       });

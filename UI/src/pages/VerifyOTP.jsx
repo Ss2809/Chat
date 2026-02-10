@@ -9,7 +9,7 @@ export default function VerifyOTP() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8000/api/user/verify-otp", {
+      const res = await axios.post("https://chat-vxd8.onrender.com/api/user/verify-otp", {
         email,
         otp,
       });

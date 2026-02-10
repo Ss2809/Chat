@@ -18,7 +18,7 @@ export default function Profile() {
   }, []);
 
   const fetchProfile = async () => {
-    const res = await axios.get("http://localhost:8000/api/user/getprofile", {
+    const res = await axios.get("https://chat-vxd8.onrender.com/api/user/getprofile", {
       headers: { Authorization: `Bearer ${token}` }
     });
     setUser(res.data.user);
@@ -30,7 +30,7 @@ export default function Profile() {
 
   const updateProfile = async () => {
     setLoading(true);
-    await axios.post("http://localhost:8000/api/user/profileupdate", form, {
+    await axios.post("https://chat-vxd8.onrender.com/api/user/profileupdate", form, {
       headers: { Authorization: `Bearer ${token}` }
     });
     alert("Profile Updated");
@@ -41,7 +41,7 @@ export default function Profile() {
   const changePassword = async () => {
     if (!oldPassword || !newPassword) return alert("Fill both fields");
 
-    await axios.post("http://localhost:8000/api/user/changepassowrd",
+    await axios.post("https://chat-vxd8.onrender.com/api/user/changepassowrd",
       { oldpassword: oldPassword, newPassword },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -57,7 +57,7 @@ export default function Profile() {
     const formData = new FormData();
     formData.append("profile", file);
 
-    await axios.post("http://localhost:8000/api/user/uploadprofile", formData, {
+    await axios.post("https://chat-vxd8.onrender.com/api/user/uploadprofile", formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data"

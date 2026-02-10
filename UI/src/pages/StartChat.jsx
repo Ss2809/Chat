@@ -13,7 +13,7 @@ export default function StartChat({ refreshChats }) {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/user/all", {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/user/all", {
        headers: {
   Authorization: `Bearer ${localStorage.getItem("token")}`
 }
@@ -36,7 +36,7 @@ export default function StartChat({ refreshChats }) {
   const startChat = async (otherId) => {
     try {
       await axios.post(
-        "http://localhost:8000/api/chat/chatcreate",
+        "https://chat-vxd8.onrender.com/api/chat/chatcreate",
         { Other_id: otherId },
         {
           headers: {

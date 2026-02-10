@@ -22,7 +22,7 @@ export default function ChatScreen() {
 
   /* 🔌 Connect socket */
   useEffect(() => {
-    const newSocket = io("http://localhost:8000", {
+    const newSocket = io("https://chat-vxd8.onrender.com", {
       auth: { token },
     });
     setSocket(newSocket);
@@ -73,14 +73,14 @@ export default function ChatScreen() {
   }, [messages]);
 
   const fetchMessages = async () => {
-    const res = await axios.get(`http://localhost:8000/api/chat/${chatId}`, {
+    const res = await axios.get(`https://chat-vxd8.onrender.com/api/chat/${chatId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setMessages(res.data);
   };
 
   const fetchChatUser = async () => {
-    const res = await axios.get("http://localhost:8000/api/chat/chatlist", {
+    const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
       headers: { Authorization: `Bearer ${token}` },
     });
     const chat = res.data.userchat.find((c) => c._id === chatId);
@@ -105,7 +105,7 @@ export default function ChatScreen() {
     if (!window.confirm("Clear all messages in this chat?")) return;
     
     try {
-      await axios.delete(`http://localhost:8000/api/chat/deletechat/${chatId}`, {
+      await axios.delete(`https://chat-vxd8.onrender.com/api/chat/deletechat/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

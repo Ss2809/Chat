@@ -39,7 +39,7 @@ export default function ChatLayout() {
 
   // Socket connection
   useEffect(() => {
-    const newSocket = io("http://localhost:8000", {
+    const newSocket = io("https://chat-vxd8.onrender.com", {
       auth: { token },
     });
     setSocket(newSocket);
@@ -113,7 +113,7 @@ export default function ChatLayout() {
 
   const fetchMe = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/user/me", {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/user/me", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMe(res.data);
@@ -124,7 +124,7 @@ export default function ChatLayout() {
 
   const fetchChats = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/chat/chatlist", {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -143,7 +143,7 @@ export default function ChatLayout() {
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/chat/${selectedChatId}`, {
+      const res = await axios.get(`https://chat-vxd8.onrender.com/api/chat/${selectedChatId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(res.data);
@@ -154,7 +154,7 @@ export default function ChatLayout() {
 
   const fetchChatUser = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/chat/chatlist", {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const chat = res.data.userchat.find((c) => c._id === selectedChatId);
@@ -181,7 +181,7 @@ export default function ChatLayout() {
     if (!window.confirm("Clear all messages in this chat?")) return;
     
     try {
-      await axios.delete(`http://localhost:8000/api/chat/deletechat/${selectedChatId}`, {
+      await axios.delete(`https://chat-vxd8.onrender.com/api/chat/deletechat/${selectedChatId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages([]);
@@ -198,7 +198,7 @@ export default function ChatLayout() {
   const deleteAccount = async () => {
     if (!window.confirm("Delete your account permanently?")) return;
 
-    await axios.delete("http://localhost:8000/api/user/deleteAccount", {
+    await axios.delete("https://chat-vxd8.onrender.com/api/user/deleteAccount", {
       headers: { Authorization: `Bearer ${token}` }
     });
 

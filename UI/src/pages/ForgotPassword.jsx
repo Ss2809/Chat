@@ -9,7 +9,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:8000/api/user/forget-password", {
+      const res = await axios.post("https://chat-vxd8.onrender.com/api/user/forget-password", {
         email,
       });
 

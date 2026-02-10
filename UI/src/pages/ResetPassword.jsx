@@ -10,7 +10,7 @@ export default function ResetPassword() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/user/reset/${token}`,
+        `https://chat-vxd8.onrender.com/api/user/reset/${token}`,
         { newPassword }
       );
 
