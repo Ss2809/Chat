@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/api/user", user);
 app.use("/api/chat", chat);
 
-/* 🔐 Socket Auth Middleware */
+
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.token;
