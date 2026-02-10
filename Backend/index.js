@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === "production") {
   const uiDistPath = path.join(__dirname, "../UI/dist");
   app.use(express.static(uiDistPath));
   // SPA fallback for client-side routes like /verify
-  app.get("*", (req, res) => {
+  app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(uiDistPath, "index.html"));
   });
 }
