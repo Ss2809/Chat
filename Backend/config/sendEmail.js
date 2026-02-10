@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendmail = async (toEmail, subject, htmltemplate) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "onboarding@resend.dev", // free plan madhe hech use kara
+      from: "onboarding@resend.dev",
       to: toEmail,
       subject: subject,
       html: htmltemplate,
@@ -16,10 +16,10 @@ const sendmail = async (toEmail, subject, htmltemplate) => {
       return false;
     }
 
-    console.log("Email sent:", data);
+    console.log("Email sent successfully:", data);
     return true;
   } catch (err) {
-    console.error("Send email failed:", err);
+    console.error("Email error :-", err);
     return false;
   }
 };
@@ -41,7 +41,7 @@ const sendrestpass = async (toEmail, subject, htmltemplate) => {
     console.log("Reset email sent:", data);
     return true;
   } catch (err) {
-    console.error("Send reset email failed:", err);
+    console.error("Email error :-", err);
     return false;
   }
 };

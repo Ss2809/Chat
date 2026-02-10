@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const OTP = require("../model/otp");
-const {sendmail,sendrestpass} = require("../config/smtp");
+const {sendmail,sendrestpass} = require("../config/sendEmail");
 const otphtml = require("../config/otpTemplate");
 const resetTemplate = require("../config/linkreset");
 const upload = require("../config/multer");
@@ -50,8 +50,11 @@ routes.post("/signup", async (req, res) => {
     });
     const subject  = "Your OTP Code for Account Verification";
     const htmltmplate = otphtml(otp);
-      sendmail(email,subject,htmltmplate);
-    res.json({ message: "OTP sent to your email" });
+    const emailSent = await sendmail(email, subject, htmltmplate);
+    if (!emailSent) {
+      return res.status(500).json({ message: "Failed to send OTP email" });
+    }
+    res.json({ message: "OTP sent to your email", otp });
   } catch (err) {
     res.status(500).json({ message: "Server error" ,err});
   }
@@ -130,8 +133,11 @@ routes.post("/forget-password", async (req, res) => {
   await user.save();
   const subject = "Reset Your Chat Application Password";
   const htmldata = resetTemplate(testing);
-  sendrestpass(email,subject,htmldata);
-  res.json({ message: "Reset Link Your Email!",});
+  const emailSent = await sendrestpass(email, subject, htmldata);
+  if (!emailSent) {
+    return res.status(500).json({ message: "Failed to send reset email" });
+  }
+  res.json({ message: "Reset Link Your Email!" });
 });
 routes.post("/reset/:token", async (req, res) => {
   const { token } = req.params;
