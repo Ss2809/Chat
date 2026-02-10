@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -13,11 +13,7 @@ export default function Profile() {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     const res = await axios.get("https://chat-vxd8.onrender.com/api/user/getprofile", {
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -26,7 +22,12 @@ export default function Profile() {
       username: res.data.user.username,
       email: res.data.user.email
     });
-  };
+  }, [token]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProfile();
+  }, [fetchProfile]);
 
   const updateProfile = async () => {
     setLoading(true);

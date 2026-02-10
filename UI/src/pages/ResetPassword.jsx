@@ -19,7 +19,8 @@ export default function ResetPassword() {
       if (res.data.message.includes("success")) {
         window.location.href = "/login";
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       alert("Reset failed");
     }
   };

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import StartChat from "./StartChat";
@@ -30,6 +30,60 @@ export default function ChatLayout() {
 
   const token = localStorage.getItem("token");
 
+  const fetchMe = useCallback(async () => {
+    try {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/user/me", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMe(res.data);
+    } catch (err) {
+      console.log("Me fetch error", err);
+    }
+  }, [token]);
+
+  const fetchChats = useCallback(async () => {
+    try {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.data && res.data.userchat) {
+        setChats(res.data.userchat);
+      } else {
+        setChats([]);
+      }
+    } catch (err) {
+      console.log("Chat list error:", err);
+      setChats([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const fetchMessages = useCallback(async () => {
+    try {
+      const res = await axios.get(`https://chat-vxd8.onrender.com/api/chat/${selectedChatId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessages(res.data);
+    } catch (err) {
+      console.log("Messages fetch error:", err);
+    }
+  }, [selectedChatId, token]);
+
+  const fetchChatUser = useCallback(async () => {
+    try {
+      const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const chat = res.data.userchat.find((c) => c._id === selectedChatId);
+      const other = chat.users.find((u) => u._id !== myId);
+      setChatUser(other);
+    } catch (err) {
+      console.log("Chat user fetch error:", err);
+    }
+  }, [myId, selectedChatId, token]);
+
   useEffect(() => {
     if (token) {
       const decoded = JSON.parse(atob(token.split(".")[1]));
@@ -49,7 +103,7 @@ export default function ChatLayout() {
     });
 
     return () => newSocket.disconnect();
-  }, []);
+  }, [token]);
 
   // Join chat + socket listeners
   useEffect(() => {
@@ -80,14 +134,14 @@ export default function ChatLayout() {
   useEffect(() => {
     fetchChats();
     fetchMe();
-  }, []);
+  }, [fetchChats, fetchMe]);
 
   useEffect(() => {
     if (selectedChatId) {
       fetchMessages();
       fetchChatUser();
     }
-  }, [selectedChatId]);
+  }, [selectedChatId, fetchMessages, fetchChatUser]);
 
   // Auto scroll
   useEffect(() => {
@@ -110,60 +164,6 @@ export default function ChatLayout() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuOpen]);
-
-  const fetchMe = async () => {
-    try {
-      const res = await axios.get("https://chat-vxd8.onrender.com/api/user/me", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMe(res.data);
-    } catch (err) {
-      console.log("Me fetch error", err);
-    }
-  };
-
-  const fetchChats = async () => {
-    try {
-      const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res.data && res.data.userchat) {
-        setChats(res.data.userchat);
-      } else {
-        setChats([]);
-      }
-    } catch (err) {
-      console.log("Chat list error:", err);
-      setChats([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchMessages = async () => {
-    try {
-      const res = await axios.get(`https://chat-vxd8.onrender.com/api/chat/${selectedChatId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessages(res.data);
-    } catch (err) {
-      console.log("Messages fetch error:", err);
-    }
-  };
-
-  const fetchChatUser = async () => {
-    try {
-      const res = await axios.get("https://chat-vxd8.onrender.com/api/chat/chatlist", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const chat = res.data.userchat.find((c) => c._id === selectedChatId);
-      const other = chat.users.find((u) => u._id !== myId);
-      setChatUser(other);
-    } catch (err) {
-      console.log("Chat user fetch error:", err);
-    }
-  };
 
   const sendMessage = () => {
     if (!newMsg.trim() || !socket) return;

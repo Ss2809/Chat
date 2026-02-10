@@ -18,9 +18,10 @@ export default function VerifyOTP() {
 
       if (res.data.message.includes("verified")) {
         localStorage.removeItem("verifyEmail");
-        window.location.href = "/login";
+        window.location.href = "/";
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       alert("Invalid OTP");
     }
   };

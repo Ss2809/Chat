@@ -24,7 +24,8 @@ export default function Signup() {
         localStorage.setItem("verifyEmail", email);
         window.location.href = "/verify";
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       alert("Signup failed");
     } finally {
       setLoading(false);

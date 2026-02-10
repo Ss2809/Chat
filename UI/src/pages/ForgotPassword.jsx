@@ -19,7 +19,8 @@ export default function ForgotPassword() {
       if (res.data.testing) {
         window.location.href = `/reset/${res.data.testing}`;
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       alert("Failed to send reset link");
     } finally {
       setLoading(false);
