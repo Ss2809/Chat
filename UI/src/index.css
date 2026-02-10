@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+:root {
+	color-scheme: dark;
+	--bg-deep: #0a0f1a;
+	--bg-soft: #0d1527;
+	--text-strong: #e6eef5;
+	--text-muted: #a8b5c1;
+	--accent: #39d0c6;
+	--accent-soft: #6fe3b6;
+	--accent-warm: #f2c879;
+	--card: rgba(10, 16, 28, 0.7);
+	--border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+	font-family: "Sora", "Segoe UI", sans-serif;
+	background: var(--bg-deep);
+	color: var(--text-strong);
+}
+
+h1,
+h2,
+h3,
+.brand-heading {
+	font-family: "Playfair Display", "Times New Roman", serif;
+	letter-spacing: 0.2px;
+}
+
+.premium-bg {
+	min-height: 100vh;
+	background:
+		radial-gradient(1200px 600px at 10% 10%, rgba(57, 208, 198, 0.18), transparent 60%),
+		radial-gradient(800px 500px at 90% 10%, rgba(242, 200, 121, 0.12), transparent 55%),
+		linear-gradient(135deg, var(--bg-deep), var(--bg-soft) 45%, var(--bg-deep));
+	position: relative;
+	overflow: hidden;
+}
+
+.premium-bg::before {
+	content: "";
+	position: absolute;
+	inset: -220px;
+	background: conic-gradient(
+		from 120deg at 50% 50%,
+		rgba(57, 208, 198, 0.08),
+		rgba(10, 15, 26, 0) 30%,
+		rgba(242, 200, 121, 0.08) 60%,
+		rgba(10, 15, 26, 0) 100%
+	);
+	filter: blur(32px);
+	opacity: 0.85;
+	pointer-events: none;
+}
+
+.premium-shell {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+}
+
+.glass-card {
+	background: var(--card);
+	border: 1px solid var(--border);
+	border-radius: 22px;
+	box-shadow:
+		0 26px 60px rgba(5, 10, 20, 0.55),
+		inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	backdrop-filter: blur(18px);
+}
+
+.input-field {
+	width: 100%;
+	background: rgba(10, 16, 28, 0.7);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	color: var(--text-strong);
+	border-radius: 14px;
+	padding: 0.9rem 1rem;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field::placeholder {
+	color: rgba(168, 181, 193, 0.7);
+}
+
+.input-field:focus {
+	outline: none;
+	border-color: rgba(57, 208, 198, 0.6);
+	box-shadow: 0 0 0 3px rgba(57, 208, 198, 0.18);
+}
+
+.primary-button {
+	background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+	color: #041018;
+	border-radius: 14px;
+	padding: 0.9rem 1rem;
+	font-weight: 600;
+	letter-spacing: 0.2px;
+	box-shadow: 0 14px 34px rgba(57, 208, 198, 0.28);
+	transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.primary-button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 18px 38px rgba(57, 208, 198, 0.38);
+	filter: saturate(1.05);
+}
+
+.primary-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.secondary-button {
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid var(--border);
+	color: var(--text-strong);
+	border-radius: 14px;
+	padding: 0.85rem 1rem;
+}
+
+.link-accent {
+	color: var(--accent-soft);
+}
+
+.helper-text {
+	color: var(--text-muted);
+}
+
+.otp-field {
+	letter-spacing: 0.45em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.12);
+	border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+	background: rgba(8, 12, 22, 0.6);
+}
