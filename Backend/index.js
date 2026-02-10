@@ -5,6 +5,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
+const path = require("path");
 
 const db = require("./db");
 const chat = require("./routes/chat");
@@ -24,6 +25,15 @@ app.use(express.json());
 
 app.use("/api/user", user);
 app.use("/api/chat", chat);
+
+if (process.env.NODE_ENV === "production") {
+  const uiDistPath = path.join(__dirname, "../UI/dist");
+  app.use(express.static(uiDistPath));
+  // SPA fallback for client-side routes like /verify
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(uiDistPath, "index.html"));
+  });
+}
 
 
 io.use((socket, next) => {
