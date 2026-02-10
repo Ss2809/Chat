@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import StartChat from "./StartChat";
 import { io } from "socket.io-client";
+import avatarPlaceholder from "../assets/avatar-white.svg";
 
 export default function ChatLayout() {
   const { chatId } = useParams();
@@ -230,7 +231,7 @@ export default function ChatLayout() {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img
-                    src={me?.profilePhoto || "https://i.pravatar.cc/150"}
+                    src={me?.profilePhoto || avatarPlaceholder}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/20"
                     alt="Profile"
                   />
@@ -338,7 +339,7 @@ export default function ChatLayout() {
               >
                 <div className="relative flex-shrink-0">
                   <img
-                    src={otherUser?.profilePhoto || "https://api.dicebear.com/7.x/avataaars/svg"}
+                    src={otherUser?.profilePhoto || avatarPlaceholder}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-transparent group-hover:ring-purple-500/30 transition-all"
                     alt={otherUser?.username}
                   />
@@ -404,7 +405,7 @@ export default function ChatLayout() {
                 <div className="relative">
                   <img
                     onClick={() => setShowProfile(true)}
-                    src={chatUser?.profilePhoto || "https://i.pravatar.cc/150"}
+                    src={chatUser?.profilePhoto || avatarPlaceholder}
                     className="w-11 h-11 rounded-full cursor-pointer object-cover ring-2 ring-purple-500/50 hover:ring-purple-500 transition-all shadow-lg shadow-purple-500/20"
                     alt={chatUser?.username}
                   />
@@ -562,7 +563,7 @@ export default function ChatLayout() {
           <div className="relative animate-in zoom-in-95 duration-300">
             <div className="relative overflow-hidden rounded-3xl border-4 border-white/20 shadow-2xl">
               <img
-                src={chatUser?.profilePhoto || "https://i.pravatar.cc/300"}
+                src={chatUser?.profilePhoto || avatarPlaceholder}
                 className="w-80 h-80 sm:w-96 sm:h-96 object-cover"
                 alt={chatUser?.username}
               />

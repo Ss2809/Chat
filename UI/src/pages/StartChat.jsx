@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import avatarPlaceholder from "../assets/avatar-white.svg";
 
 export default function StartChat({ refreshChats }) {
   const [users, setUsers] = useState([]);
@@ -70,7 +71,7 @@ export default function StartChat({ refreshChats }) {
               className="flex items-center gap-3 p-2 bg-slate-800 hover:bg-slate-700 rounded cursor-pointer"
             >
               <img
-                src={u.profilePhoto || "https://api.dicebear.com/7.x/avataaars/svg"}
+                src={u.profilePhoto || avatarPlaceholder}
                 className="w-8 h-8 rounded-full"
               />
               <p>{u.username}</p>

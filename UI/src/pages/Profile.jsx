@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import avatarPlaceholder from "../assets/avatar-white.svg";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -85,7 +86,7 @@ export default function Profile() {
         {/* Profile Photo */}
         <div className="flex flex-col items-center mb-6">
           <img
-            src={user?.profileImg || "https://i.pravatar.cc/150"}
+            src={user?.profileImg || avatarPlaceholder}
             className="w-28 h-28 rounded-full object-cover mb-3 ring-2 ring-teal-400/40 shadow-lg shadow-teal-500/20"
           />
           <input

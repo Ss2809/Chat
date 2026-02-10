@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
+import avatarPlaceholder from "../assets/avatar-white.svg";
 
 export default function ChatScreen() {
   const { chatId } = useParams();
@@ -141,7 +142,7 @@ export default function ChatScreen() {
             <div className="relative">
               <img
                 onClick={() => setShowProfile(true)}
-                src={chatUser?.profilePhoto || "https://i.pravatar.cc/150"}
+                src={chatUser?.profilePhoto || avatarPlaceholder}
                 className="w-11 h-11 rounded-full cursor-pointer object-cover ring-2 ring-purple-500/50 hover:ring-purple-500 transition-all shadow-lg shadow-purple-500/20"
                 alt={chatUser?.username}
               />
@@ -278,7 +279,7 @@ export default function ChatScreen() {
           <div className="relative animate-in zoom-in-95 duration-300">
             <div className="relative overflow-hidden rounded-3xl border-4 border-white/20 shadow-2xl">
               <img
-                src={chatUser?.profilePhoto || "https://i.pravatar.cc/300"}
+                src={chatUser?.profilePhoto || avatarPlaceholder}
                 className="w-80 h-80 sm:w-96 sm:h-96 object-cover"
                 alt={chatUser?.username}
               />
