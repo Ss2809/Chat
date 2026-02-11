@@ -3,28 +3,38 @@ const nodemailer = require("nodemailer");
 // create transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
- host: process.env.MAIL_HOST,
+  host: process.env.MAIL_HOST,
   port: 587,
   auth: {
-    user: process.env.SMTP_USER , 
-    pass: process.env.SMTP_PASS, 
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 
+const smtpFrom = process.env.SMTP_FROM || process.env.SMTP_USER;
 
-async function sendMail(to, subject, text) {
+async function sendMail({ to, subject, html, text }) {
   try {
     const info = await transporter.sendMail({
-      from:  process.env.SMTP_USER,
-      to: to,
-      subject: subject,
+
+    
+      from: smtpFrom ? `"Chat App" <${smtpFrom}>` : "Chat App",
+      to,
+      subject,
       text,
+      html,
+
     });
 
     console.log("Email sent:", info.messageId);
+    return true;
   } catch (error) {
     console.log("Error:", error);
+    return false;
   }
 }
 
-module.exports = sendMail;
+const sendmail = (to, subject, html) => sendMail({ to, subject, html });
+const sendrestpass = (to, subject, html) => sendMail({ to, subject, html });
+
+module.exports = { sendmail, sendrestpass };
