@@ -5,7 +5,7 @@ import avatarPlaceholder from "../assets/avatar-white.svg";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
-  const [form, setForm] = useState({ username: "", email: "" });
+  const [form, setForm] = useState({ username: "", email: "", bio: "" });
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [file, setFile] = useState(null);
@@ -21,7 +21,8 @@ export default function Profile() {
     setUser(res.data.user);
     setForm({
       username: res.data.user.username,
-      email: res.data.user.email
+      email: res.data.user.email,
+      bio: res.data.user.bio || ""
     });
   }, [token]);
 
@@ -115,6 +116,12 @@ export default function Profile() {
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="input-field"
             placeholder="Email"
+          />
+          <textarea
+            value={form.bio}
+            onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            className="input-field min-h-[96px] resize-y"
+            placeholder="Bio"
           />
           <button
             onClick={updateProfile}
