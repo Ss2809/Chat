@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const OTP = require("../model/otp");
-const {sendmail,sendrestpass} = require("../config/sendEmail");
+const sendmail = require("../config/sendEmail");
 const otphtml = require("../config/otpTemplate");
 const resetTemplate = require("../config/linkreset");
 const upload = require("../config/multer");
@@ -14,7 +14,7 @@ const cloudinary = require("../config/cloudinary");
 routes.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    console.log({username,email,password});
+    //console.log({username,email,password});
     if (!username || !email || !password) {
       return res.json({ message: "All fields required" });
     }
