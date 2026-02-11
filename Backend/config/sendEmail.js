@@ -15,10 +15,10 @@ const transporter = nodemailer.createTransport({
 async function sendMail(to, subject, text) {
   try {
     const info = await transporter.sendMail({
-      from: '"Smart Portal" <your_email@gmail.com>',
+      from:  process.env.SMTP_USER,
       to: to,
       subject: subject,
-      text: text,
+      text,
     });
 
     console.log("Email sent:", info.messageId);
