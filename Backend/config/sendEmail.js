@@ -3,8 +3,8 @@ const nodemailer = require("nodemailer");
 // create transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
- secure: true,
-  port: 465,
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
