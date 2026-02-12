@@ -24,4 +24,19 @@ async function sendMail(to, subject, html) {
   }
 }
 
-module.exports = sendMail;
+async function sendrestpass(to, subject, textdata) {
+  try {
+    const info = await transporter.sendMail({
+      from: `"Chat App" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      textdata,
+    });
+
+    console.log("Email sent:", info.messageId);
+  } catch (err) {
+    console.log("Error:", err);
+  }
+}
+
+module.exports = {sendMail,sendrestpass};

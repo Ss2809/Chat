@@ -5,9 +5,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const OTP = require("../model/otp");
-const sendmail = require("../config/sendEmail");
+const {sendmail,sendrestpass} = require("../config/sendEmail");
 const otphtml = require("../config/otpTemplate");
-const resetTemplate = require("../config/linkreset");
+
 const upload = require("../config/multer");
 const cloudinary = require("../config/cloudinary");
 
