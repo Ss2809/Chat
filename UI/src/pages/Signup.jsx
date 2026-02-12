@@ -14,7 +14,7 @@ export default function Signup() {
     try {
       setLoading(true);
 
-      const res = await axios.post("https://chat-vxd8.onrender.com/api/user/signup", {
+      const res = await axios.post("https://chat-vxd8.onrender.com/api/user/signup", {  
         username,
         email,
         password,

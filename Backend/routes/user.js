@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const OTP = require("../model/otp");
 const {sendmail,sendrestpass} = require("../config/sendEmail");
-const otphtml = require("../config/otpTemplate");
+const otpTemplate = require("../config/otpTemplate");
 
 const upload = require("../config/multer");
 const cloudinary = require("../config/cloudinary");
@@ -48,7 +48,7 @@ routes.post("/signup", async (req, res) => {
       tempUser: { username, email, password: hashed },
     });
     const subject = "Your OTP Code for Account Verification";
-    const htmltmplate = otphtml(otp);
+    const htmltmplate = otpTemplate(otp);
     const emailSent = await sendmail(email, subject, htmltmplate);
     if (!emailSent) {
       return res.status(500).json({ message: "Failed to send OTP email" });
