@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendMail(to, subject, html) {
+async function sendmail(to, subject, html) {
   try {
     const info = await transporter.sendMail({
       from: `"Chat App" <${process.env.SMTP_USER}>`,
@@ -19,24 +19,28 @@ async function sendMail(to, subject, html) {
     });
 
     console.log("Email sent:", info.messageId);
+    return true;
   } catch (err) {
     console.log("Error:", err);
+    return false;
   }
 }
 
-async function sendrestpass(to, subject, textdata) {
+async function sendrestpass(to, subject, html) {
   try {
     const info = await transporter.sendMail({
       from: `"Chat App" <${process.env.SMTP_USER}>`,
       to,
       subject,
-      textdata,
+      html,
     });
 
     console.log("Email sent:", info.messageId);
+    return true;
   } catch (err) {
     console.log("Error:", err);
+    return false;
   }
 }
 
-module.exports = {sendMail,sendrestpass};
+module.exports = { sendmail, sendrestpass };
