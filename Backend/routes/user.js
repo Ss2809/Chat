@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const OTP = require("../model/otp");
-const { sendmail, sendrestpass } = require("../config/sendEmail");
+const sendmail = require("../config/sendEmail");
 const otphtml = require("../config/otpTemplate");
 const resetTemplate = require("../config/linkreset");
 const upload = require("../config/multer");
@@ -14,7 +14,6 @@ const cloudinary = require("../config/cloudinary");
 routes.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    //console.log({username,email,password});
     if (!username || !email || !password) {
       return res.json({ message: "All fields required" });
     }
@@ -48,7 +47,7 @@ routes.post("/signup", async (req, res) => {
       expiresAt,
       tempUser: { username, email, password: hashed },
     });
-    const subject  = "Your OTP Code for Account Verification";
+    const subject = "Your OTP Code for Account Verification";
     const htmltmplate = otphtml(otp);
     const emailSent = await sendmail(email, subject, htmltmplate);
     if (!emailSent) {
@@ -56,7 +55,7 @@ routes.post("/signup", async (req, res) => {
     }
     res.json({ message: "OTP sent to your email", otp });
   } catch (err) {
-    res.status(500).json({ message: "Server error" ,err});
+    res.status(500).json({ message: "Server error", err });
   }
 });
 
@@ -114,31 +113,45 @@ routes.post("/login", async (req, res) => {
   }
 });
 
-//forget-password
 routes.post("/forget-password", async (req, res) => {
   const { email } = req.body;
+
   if (!email) {
-    return res.json({ message: "email no Fill!" });
+    return res.json({ message: "Email not filled!" });
   }
+
   const user = await User.findOne({ email: email });
   if (!user) {
-    return res.json({ message: "email no not Register!!" });
+    return res.json({ message: "Email not registered!" });
   }
-  const testing = (user.resetToken = jwt.sign(
-    { _id: user._id },
-    process.env.resetToken,
-    { expiresIn: "15m" },
-  ));
+
+  const testing = jwt.sign({ _id: user._id }, process.env.resetToken, {
+    expiresIn: "15m",
+  });
+
+  user.resetToken = testing;
   user.resetTokenExpires = Date.now() + 15 * 60 * 1000;
   await user.save();
+
   const subject = "Reset Your Chat Application Password";
-  const htmldata = resetTemplate(testing);
-  const emailSent = await sendrestpass(email, subject, htmldata);
+
+  const textdata = `
+Password Reset Link:
+
+https://chat-vxd8.onrender.com/reset/${testing}
+
+This link will expire in 15 minutes.
+  `;
+
+  const emailSent = await sendrestpass(email, subject, textdata);
+
   if (!emailSent) {
     return res.status(500).json({ message: "Failed to send reset email" });
   }
-  res.json({ message: "Reset Link Your Email!" });
+
+  res.json({ message: "Reset Link sent to your Email!" });
 });
+
 routes.post("/reset/:token", async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
@@ -242,90 +255,94 @@ routes.post("/changepassowrd", auth, async (req, res) => {
   res.json({ message: "password change succfully!!" });
 });
 
+//add multer and cloudinary and this setup okay
+routes.post(
+  "/uploadprofile",
+  auth,
+  upload.single("profile"),
+  async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.json({ message: "User not found!!" });
+      }
 
-//add multer and cloudinary and this setup okay 
-routes.post("/uploadprofile", auth, upload.single("profile"), async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.json({ message: "User not found!!" });
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const fileBase64 = req.file.buffer.toString("base64");
+      const dataUri = `data:${req.file.mimetype};base64,${fileBase64}`;
+      const uploadResult = await cloudinary.uploader.upload(dataUri, {
+        folder: "chat_profiles",
+        resource_type: "image",
+      });
+
+      user.profilePhoto = uploadResult.secure_url;
+      user.profileImg = uploadResult.secure_url;
+      await user.save();
+
+      res.json({
+        message: "Profile Image upload successfully!!",
+        profilePhoto: user.profilePhoto,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "error", error });
     }
+  },
+);
 
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const fileBase64 = req.file.buffer.toString("base64");
-    const dataUri = `data:${req.file.mimetype};base64,${fileBase64}`;
-    const uploadResult = await cloudinary.uploader.upload(dataUri, {
-      folder: "chat_profiles",
-      resource_type: "image"
-    });
-
-    user.profilePhoto = uploadResult.secure_url;
-    user.profileImg = uploadResult.secure_url;
-    await user.save();
-
-    res.json({ message: "Profile Image upload successfully!!", profilePhoto: user.profilePhoto });
-  } catch (error) {
-    res.status(500).json({ message: "error", error });
-  }
-});
-
-
-routes.get("/me",auth, async(req,res)=>{
+routes.get("/me", auth, async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId).select("-password");
-    res.json(user)
+    res.json(user);
   } catch (error) {
-    res.json({message : "error", error})
+    res.json({ message: "error", error });
   }
-})
+});
 
-routes.get("/user/:id",auth, async(req,res)=>{
+routes.get("/user/:id", auth, async (req, res) => {
   try {
-    const {id} = req.params;
-    const user = await User.findOne({_id : id}).select("-password");
-    res.json({user})
+    const { id } = req.params;
+    const user = await User.findOne({ _id: id }).select("-password");
+    res.json({ user });
   } catch (error) {
-    res.json({message : "error", error})
+    res.json({ message: "error", error });
   }
-})
+});
 
-routes.get("/search",auth,async(req,res)=>{
-    const {q} = req.query;
-    if(!q){
-      res.json({user : []});
-    }
-    const user = await User.find({
-      $or : [{username :{ $regex : q,$options : "i"}} ,
-         {email : {$regex :q,$options : "i"}}
-       ]
-    }).select("-password");
-    res.json({user});
-})
+routes.get("/search", auth, async (req, res) => {
+  const { q } = req.query;
+  if (!q) {
+    res.json({ user: [] });
+  }
+  const user = await User.find({
+    $or: [
+      { username: { $regex: q, $options: "i" } },
+      { email: { $regex: q, $options: "i" } },
+    ],
+  }).select("-password");
+  res.json({ user });
+});
 
-routes.delete("/deleteAccount", auth, async(req,res)=>{
+routes.delete("/deleteAccount", auth, async (req, res) => {
   const userId = req.user._id;
-  //const accessToken = take when frontend addd okey and null 
+  //const accessToken = take when frontend addd okey and null
   const user = await User.findByIdAndDelete(userId);
-  res.json({message : "User Account delete succfully"});
-
-
-})
+  res.json({ message: "User Account delete succfully" });
+});
 routes.get("/all", auth, async (req, res) => {
   try {
     const userId = req.user._id;
 
     const users = await User.find(
       { _id: { $ne: userId } }, // exclude self
-      "username email profilePhoto"
+      "username email profilePhoto",
     );
 
     res.json(users);
-    
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }

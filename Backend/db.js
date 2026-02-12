@@ -11,4 +11,3 @@ mongoose
 }
 
 module.exports = db;
-
