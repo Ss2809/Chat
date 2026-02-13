@@ -4,6 +4,38 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import avatarPlaceholder from "../assets/avatar-white.svg";
 
+// Message Status Icon Component
+const MessageStatus = ({ status, isMine }) => {
+  if (!isMine) return null;
+  
+  if (status === "read") {
+    // Double blue tick for read
+    return (
+      <svg className="w-4 h-4 text-[#00f5ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 12l5 5L17 7" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l5 5L22 7" />
+      </svg>
+    );
+  }
+  
+  if (status === "delivered") {
+    // Double grey tick for delivered
+    return (
+      <svg className="w-4 h-4 text-[#6b6b80]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 12l5 5L17 7" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l5 5L22 7" />
+      </svg>
+    );
+  }
+  
+  // Single tick for sent
+  return (
+    <svg className="w-4 h-4 text-[#6b6b80]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    </svg>
+  );
+};
+
 export default function ChatScreen() {
   const { chatId } = useParams();
   const navigate = useNavigate();
@@ -58,9 +90,44 @@ export default function ChatScreen() {
 
     socket.on("receiveMessage", (data) => {
       setMessages((prev) => [...prev, data]);
+      
+      // Mark message as delivered if it's from another user
+      const senderId = data.sender?._id || data.sender;
+      if (senderId !== myId) {
+        socket.emit("messageDelivered", {
+          messageIds: [data._id],
+          chatId
+        });
+      }
     });
     socket.on("onlineUsers", (users) => {
       setOnlineUsers(users);
+    });
+
+    // Listen for message status updates
+    socket.on("messageStatusUpdate", (data) => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg._id === data.messageId
+            ? { ...msg, status: data.status, deliveredAt: data.deliveredAt, readAt: data.readAt }
+            : msg
+        )
+      );
+    });
+
+    // Listen for batch read updates
+    socket.on("messagesReadUpdate", (data) => {
+      if (data.chatId === chatId) {
+        setMessages((prev) =>
+          prev.map((msg) => {
+            const senderId = msg.sender?._id || msg.sender;
+            if (senderId === myId && msg.status !== "read") {
+              return { ...msg, status: "read", readAt: data.readAt };
+            }
+            return msg;
+          })
+        );
+      }
     });
 
     socket.on("showTyping", (username) => {
@@ -75,14 +142,30 @@ export default function ChatScreen() {
       socket.off("receiveMessage");
       socket.off("showTyping");
       socket.off("hideTyping");
+      socket.off("messageStatusUpdate");
+      socket.off("messagesReadUpdate");
     };
-  }, [socket, chatId]);
+  }, [socket, chatId, myId]);
 
   /* Load messages + user */
   useEffect(() => {
     fetchMessages();
     fetchChatUser();
   }, [fetchMessages, fetchChatUser]);
+
+  /* Mark messages as read when chat is opened */
+  useEffect(() => {
+    if (socket && chatId && messages.length > 0) {
+      const unreadMessages = messages.filter(msg => {
+        const senderId = msg.sender?._id || msg.sender;
+        return senderId !== myId && msg.status !== "read";
+      });
+      
+      if (unreadMessages.length > 0) {
+        socket.emit("messagesRead", { chatId });
+      }
+    }
+  }, [socket, chatId, messages, myId]);
 
   /* Auto scroll */
   useEffect(() => {
@@ -202,10 +285,14 @@ export default function ChatScreen() {
 
         {messages.map((msg, i) => {
           const isMine = (msg.sender?._id || msg.sender) === myId;
+          const messageTime = new Date(msg.createdAt).toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
           
           return (
             <div
-              key={i}
+              key={msg._id || i}
               className={`flex ${isMine ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
             >
               <div
@@ -216,6 +303,10 @@ export default function ChatScreen() {
                 }`}
               >
                 <p className="text-sm leading-relaxed break-words">{msg.content}</p>
+                <div className={`flex items-center gap-1 mt-1 ${isMine ? "justify-end" : "justify-start"}`}>
+                  <span className="text-[10px] text-white/50">{messageTime}</span>
+                  <MessageStatus status={msg.status || "sent"} isMine={isMine} />
+                </div>
               </div>
             </div>
           );

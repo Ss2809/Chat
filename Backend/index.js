@@ -57,9 +57,92 @@ io.on("connection", (socket) => {
       chatId: data.chatId,
       sender: socket.user._id,
       content: data.text,
+      status: "sent"
     });
 
-    io.to(data.chatId).emit("receiveMessage", msg);
+    const populatedMsg = await Message.findById(msg._id).populate("sender", "username profilePhoto");
+    io.to(data.chatId).emit("receiveMessage", populatedMsg);
+  });
+
+  // Mark messages as delivered when received
+  socket.on("messageDelivered", async (data) => {
+    const { messageIds, chatId } = data;
+    const userId = socket.user._id;
+    const now = new Date();
+
+    await Message.updateMany(
+      {
+        _id: { $in: messageIds },
+        sender: { $ne: userId },
+        status: "sent"
+      },
+      {
+        $set: { status: "delivered", deliveredAt: now },
+        $addToSet: {
+          deliveredTo: { user: userId, deliveredAt: now }
+        }
+      }
+    );
+
+    // Notify sender about delivery
+    const messages = await Message.find({ _id: { $in: messageIds } });
+    messages.forEach((msg) => {
+      const senderSocketId = onlineUsers.get(msg.sender.toString());
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messageStatusUpdate", {
+          messageId: msg._id,
+          status: "delivered",
+          deliveredAt: now
+        });
+      }
+    });
+  });
+
+  // Mark messages as read
+  socket.on("messagesRead", async (data) => {
+    const { chatId } = data;
+    const userId = socket.user._id;
+    const now = new Date();
+
+    const updatedMessages = await Message.find({
+      chatId: chatId,
+      sender: { $ne: userId },
+      status: { $ne: "read" }
+    });
+
+    await Message.updateMany(
+      {
+        chatId: chatId,
+        sender: { $ne: userId },
+        status: { $ne: "read" }
+      },
+      {
+        $set: { status: "read", readAt: now },
+        $addToSet: {
+          seenBy: userId,
+          readBy: { user: userId, readAt: now }
+        }
+      }
+    );
+
+    // Notify senders about read receipts
+    updatedMessages.forEach((msg) => {
+      const senderSocketId = onlineUsers.get(msg.sender.toString());
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messageStatusUpdate", {
+          messageId: msg._id,
+          status: "read",
+          readAt: now
+        });
+      }
+    });
+
+    // Also broadcast to the chat room
+    socket.to(chatId).emit("messagesReadUpdate", {
+      chatId,
+      readBy: userId,
+      readAt: now
+    });
   });
 
   socket.on("showTyping", (chatId) => {
