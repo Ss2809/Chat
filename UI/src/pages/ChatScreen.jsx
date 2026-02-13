@@ -4,35 +4,45 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import avatarPlaceholder from "../assets/avatar-white.svg";
 
-// Message Status Icon Component
+// Message Status Icon Component - Premium minimal style
 const MessageStatus = ({ status, isMine }) => {
   if (!isMine) return null;
   
   if (status === "read") {
-    // Double blue tick for read
+    // Double check - subtle white/silver for read
     return (
-      <svg className="w-4 h-4 text-[#00f5ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 12l5 5L17 7" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l5 5L22 7" />
-      </svg>
+      <div className="flex items-center gap-0.5 opacity-80">
+        <svg className="w-3.5 h-3.5 text-white/90" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+        </svg>
+        <svg className="w-3.5 h-3.5 -ml-2 text-white/90" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+        </svg>
+      </div>
     );
   }
   
   if (status === "delivered") {
-    // Double grey tick for delivered
+    // Double check - muted for delivered
     return (
-      <svg className="w-4 h-4 text-[#6b6b80]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 12l5 5L17 7" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l5 5L22 7" />
-      </svg>
+      <div className="flex items-center gap-0.5 opacity-50">
+        <svg className="w-3.5 h-3.5 text-white/70" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+        </svg>
+        <svg className="w-3.5 h-3.5 -ml-2 text-white/70" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+        </svg>
+      </div>
     );
   }
   
-  // Single tick for sent
+  // Single check - very subtle for sent
   return (
-    <svg className="w-4 h-4 text-[#6b6b80]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
+    <div className="opacity-40">
+      <svg className="w-3.5 h-3.5 text-white/60" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+      </svg>
+    </div>
   );
 };
 
@@ -296,15 +306,15 @@ export default function ChatScreen() {
               className={`flex ${isMine ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
             >
               <div
-                className={`max-w-[75%] sm:max-w-[60%] px-4 py-3 ${
+                className={`max-w-[75%] sm:max-w-[60%] px-4 py-2.5 ${
                   isMine
                     ? "chat-bubble-mine text-white shadow-lg shadow-[#ff2d7a]/20"
                     : "chat-bubble-other text-white"
                 }`}
               >
                 <p className="text-sm leading-relaxed break-words">{msg.content}</p>
-                <div className={`flex items-center gap-1 mt-1 ${isMine ? "justify-end" : "justify-start"}`}>
-                  <span className="text-[10px] text-white/50">{messageTime}</span>
+                <div className={`flex items-center gap-1.5 mt-1.5 ${isMine ? "justify-end" : "justify-start"}`}>
+                  <span className="text-[10px] text-white/40 font-light tracking-wide">{messageTime}</span>
                   <MessageStatus status={msg.status || "sent"} isMine={isMine} />
                 </div>
               </div>
