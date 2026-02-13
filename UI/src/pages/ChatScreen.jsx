@@ -4,43 +4,39 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import avatarPlaceholder from "../assets/avatar-white.svg";
 
-// Message Status Icon Component - Premium minimal style
+// Message Status Icon Component - Clean minimal style
 const MessageStatus = ({ status, isMine }) => {
   if (!isMine) return null;
   
   if (status === "read") {
-    // Double check - subtle white/silver for read
+    // Double check - white for read
     return (
-      <div className="flex items-center gap-0.5 opacity-80">
-        <svg className="w-3.5 h-3.5 text-white/90" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
-        </svg>
-        <svg className="w-3.5 h-3.5 -ml-2 text-white/90" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+      <div className="flex items-center">
+        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l4.5 4.5 9-9" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75l4.5 4.5 9-9" />
         </svg>
       </div>
     );
   }
   
   if (status === "delivered") {
-    // Double check - muted for delivered
+    // Double check - grey for delivered
     return (
-      <div className="flex items-center gap-0.5 opacity-50">
-        <svg className="w-3.5 h-3.5 text-white/70" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
-        </svg>
-        <svg className="w-3.5 h-3.5 -ml-2 text-white/70" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+      <div className="flex items-center">
+        <svg className="w-4 h-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l4.5 4.5 9-9" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75l4.5 4.5 9-9" />
         </svg>
       </div>
     );
   }
   
-  // Single check - very subtle for sent
+  // Single check for sent
   return (
-    <div className="opacity-40">
-      <svg className="w-3.5 h-3.5 text-white/60" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 2.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+    <div className="flex items-center">
+      <svg className="w-4 h-4 text-white/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
       </svg>
     </div>
   );
@@ -99,15 +95,30 @@ export default function ChatScreen() {
     socket.off("onlineUsers");
 
     socket.on("receiveMessage", (data) => {
-      setMessages((prev) => [...prev, data]);
-      
-      // Mark message as delivered if it's from another user
+      // Add status if not present
+      const messageWithStatus = { ...data, status: data.status || "sent" };
       const senderId = data.sender?._id || data.sender;
-      if (senderId !== myId) {
+      
+      if (senderId === myId) {
+        // Replace temp message with real one from server
+        setMessages((prev) => {
+          // Remove any temp messages and add the real one
+          const filtered = prev.filter(msg => 
+            !(msg.sender?._id === myId && msg.content === data.content && msg._id.toString().length < 20)
+          );
+          return [...filtered, messageWithStatus];
+        });
+      } else {
+        setMessages((prev) => [...prev, messageWithStatus]);
+        // Mark message as delivered
         socket.emit("messageDelivered", {
           messageIds: [data._id],
           chatId
         });
+        // Also emit read since user is viewing the chat
+        setTimeout(() => {
+          socket.emit("messagesRead", { chatId });
+        }, 500);
       }
     });
     socket.on("onlineUsers", (users) => {
@@ -185,6 +196,18 @@ export default function ChatScreen() {
   /* Send message */
   const sendMessage = () => {
     if (!newMsg.trim() || !socket) return;
+
+    // Optimistically add message with sent status
+    const tempId = Date.now().toString();
+    const tempMessage = {
+      _id: tempId,
+      content: newMsg,
+      sender: { _id: myId },
+      chatId,
+      status: "sent",
+      createdAt: new Date().toISOString()
+    };
+    setMessages((prev) => [...prev, tempMessage]);
 
     socket.emit("sendMessage", {
       chatId,
