@@ -8,14 +8,15 @@ import avatarPlaceholder from "../assets/avatar-white.svg";
 const MessageStatus = ({ status, isMine }) => {
   if (!isMine) return null;
   
+  // Use colors that work on blue/purple gradient background
   if (status === "read") {
-    // Double check - bright white for read
+    // Double check - bright cyan for read
     return (
       <div className="flex items-center -space-x-1">
-        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
-        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -23,23 +24,23 @@ const MessageStatus = ({ status, isMine }) => {
   }
   
   if (status === "delivered") {
-    // Double check - visible grey for delivered
+    // Double check - light blue for delivered
     return (
       <div className="flex items-center -space-x-1">
-        <svg className="w-4 h-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg className="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
-        <svg className="w-4 h-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg className="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
     );
   }
   
-  // Single check for sent - visible
+  // Single check for sent - light color
   return (
     <div className="flex items-center">
-      <svg className="w-4 h-4 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <svg className="w-4 h-4 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     </div>
@@ -341,7 +342,7 @@ export default function ChatScreen() {
               >
                 <p className="text-sm leading-relaxed break-words">{msg.content}</p>
                 <div className={`flex items-center gap-1.5 mt-1.5 ${isMine ? "justify-end" : "justify-start"}`}>
-                  <span className="text-[10px] text-white/40 font-light tracking-wide">{messageTime}</span>
+                  <span className="text-[10px] text-blue-100/80 font-light tracking-wide">{messageTime}</span>
                   <MessageStatus status={msg.status || "sent"} isMine={isMine} />
                 </div>
               </div>
