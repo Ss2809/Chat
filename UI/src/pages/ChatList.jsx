@@ -126,12 +126,48 @@ export default function ChatLayout() {
       setTypingUser("");
     });
 
+    socket.on("messageStatusUpdate", ({ messageId, status, deliveredAt, readAt }) => {
+      setMessages((prev) =>
+        prev.map((message) =>
+          message._id === messageId
+            ? {
+                ...message,
+                status,
+                deliveredAt: deliveredAt || message.deliveredAt,
+                readAt: readAt || message.readAt,
+              }
+            : message
+        )
+      );
+    });
+
     return () => {
       socket.off("receiveMessage");
       socket.off("showTyping");
       socket.off("hideTyping");
+      socket.off("messageStatusUpdate");
     };
   }, [socket, selectedChatId]);
+
+  useEffect(() => {
+    if (!socket || !selectedChatId || !myId || !messages.length) return;
+
+    const incomingMessages = messages.filter((msg) => (msg.sender?._id || msg.sender) !== myId);
+
+    const justReceivedIds = incomingMessages
+      .filter((msg) => msg.status === "sent")
+      .map((msg) => msg._id)
+      .filter(Boolean);
+
+    if (justReceivedIds.length > 0) {
+      socket.emit("messageDelivered", { chatId: selectedChatId, messageIds: justReceivedIds });
+    }
+
+    const hasUnreadIncoming = incomingMessages.some((msg) => msg.status !== "read");
+    if (hasUnreadIncoming) {
+      socket.emit("messagesRead", { chatId: selectedChatId });
+    }
+  }, [socket, selectedChatId, myId, messages]);
 
   // Load data
   useEffect(() => {
@@ -499,6 +535,7 @@ export default function ChatLayout() {
 
             {messages.map((msg, i) => {
               const isMine = (msg.sender?._id || msg.sender) === myId;
+              const messageStatus = msg.status === "read" ? "Seen" : msg.status === "delivered" ? "Delivered" : "Sent";
               
               return (
                 <div
@@ -514,6 +551,9 @@ export default function ChatLayout() {
                     style={!isMine ? { color: 'var(--text-pure)' } : {}}
                   >
                     <p className="text-sm leading-relaxed break-words">{msg.content}</p>
+                    {isMine && (
+                      <p className="mt-1 text-[11px] opacity-80 text-right">{messageStatus}</p>
+                    )}
                   </div>
                 </div>
               );
@@ -563,7 +603,7 @@ export default function ChatLayout() {
               <button
                 onClick={sendMessage}
                 disabled={!newMsg.trim()}
-                className="px-6 py-3 bg-gradient-to-r from-[#00f5ff] to-[#ff2d7a] hover:from-[#00f5ff]/90 hover:to-[#ff2d7a]/90 disabled:from-[#6b6b80]/20 disabled:to-[#6b6b80]/20 disabled:cursor-not-allowed rounded-2xl font-bold shadow-lg shadow-[#00f5ff]/20 transition-all duration-200 hover:scale-105 active:scale-95 disabled:scale-100 disabled:shadow-none flex items-center gap-2 text-[#050508]"
+                className="px-6 py-3 bg-[#2563eb] hover:bg-[#1d4ed8] disabled:bg-[#6b6b80]/30 disabled:cursor-not-allowed rounded-2xl font-bold transition-all duration-200 hover:scale-105 active:scale-95 disabled:scale-100 flex items-center gap-2 text-white"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

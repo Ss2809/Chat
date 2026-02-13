@@ -395,7 +395,8 @@ h1, h2, h3, .brand-heading {
 
 /* === CHAT SPECIFIC === */
 .chat-bubble-mine {
-	background: linear-gradient(135deg, #3b82f6, #6366f1);
+	background: #2563eb;
+	border: 1px solid #1d4ed8;
 	border-radius: 20px 20px 6px 20px;
 }
 
@@ -407,7 +408,8 @@ h1, h2, h3, .brand-heading {
 
 /* Light mode chat bubbles */
 [data-theme="light"] .chat-bubble-mine {
-	background: linear-gradient(135deg, #2563eb, #4f46e5);
+	background: #2563eb;
+	border-color: #1d4ed8;
 }
 
 [data-theme="light"] .chat-bubble-other {
