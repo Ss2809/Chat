@@ -4,19 +4,18 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import avatarPlaceholder from "../assets/avatar-white.svg";
 
-// Message Status Icon Component - Clean minimal style
+// Message Status Icon Component - Simple visible ticks
 const MessageStatus = ({ status, isMine }) => {
   if (!isMine) return null;
   
-  // Use colors that work on blue/purple gradient background
   if (status === "read") {
-    // Double check - bright cyan for read
+    // Double check - white for read
     return (
-      <div className="flex items-center -space-x-1">
-        <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <div className="flex items-center">
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
-        <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg className="w-4 h-4 -ml-1.5" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -24,23 +23,23 @@ const MessageStatus = ({ status, isMine }) => {
   }
   
   if (status === "delivered") {
-    // Double check - light blue for delivered
+    // Double check - light white for delivered
     return (
-      <div className="flex items-center -space-x-1">
-        <svg className="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <div className="flex items-center">
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="3">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
-        <svg className="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg className="w-4 h-4 -ml-1.5" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="3">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
     );
   }
   
-  // Single check for sent - light color
+  // Single check for sent
   return (
     <div className="flex items-center">
-      <svg className="w-4 h-4 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="3">
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     </div>
@@ -342,7 +341,7 @@ export default function ChatScreen() {
               >
                 <p className="text-sm leading-relaxed break-words">{msg.content}</p>
                 <div className={`flex items-center gap-1.5 mt-1.5 ${isMine ? "justify-end" : "justify-start"}`}>
-                  <span className="text-[10px] text-blue-100/80 font-light tracking-wide">{messageTime}</span>
+                  <span className="text-[10px] font-light tracking-wide" style={{ color: 'rgba(255,255,255,0.6)' }}>{messageTime}</span>
                   <MessageStatus status={msg.status || "sent"} isMine={isMine} />
                 </div>
               </div>
