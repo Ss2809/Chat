@@ -40,7 +40,7 @@ routes.get("/chatlist", auth, async(req,res)=>{
   }
   const userchat = await Chat.find({
     users:{$in :[userId]}
-  }).populate("users", "username email  profilePhoto").sort({updatedAt : -1});
+  }).populate("users", "username email profilePhoto bio").sort({updatedAt : -1});
   res.json({
   userchat,
   loggedInUserId: userId
@@ -52,7 +52,7 @@ routes.get("/:chatId", auth, async (req, res) => {
   const { chatId } = req.params;
 
   const messages = await Message.find({ chatId: chatId })
-    .populate("sender", "username profilePhoto");
+    .populate("sender", "username profilePhoto bio");
 
   res.json(messages);
 });

@@ -10,7 +10,7 @@ const messageSchema = mongoose.Schema({
       ref: "User"
     }
   ],
-  // Delivery metrics
+ 
   status: {
     type: String,
     enum: ["sent", "delivered", "read"],

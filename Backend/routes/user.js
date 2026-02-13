@@ -96,10 +96,10 @@ routes.post("/login", async (req, res) => {
     const accessToken = jwt.sign(
       { _id: user._id, username: username },
       process.env.accessToken,
-      { expiresIn: "14d" },
+      { expiresIn: "2h" },
     );
     const refreshToken = jwt.sign({ _id: user._id }, process.env.refreshToken, {
-      expiresIn: "30d",
+      expiresIn: "1d",
     });
     res.cookie(refreshToken, "refreshToken", {
       httpOnly: true,
@@ -280,7 +280,7 @@ routes.post(
       });
 
       user.profilePhoto = uploadResult.secure_url;
-      user.profileImg = uploadResult.secure_url;
+     
       await user.save();
 
       res.json({
@@ -339,7 +339,7 @@ routes.get("/all", auth, async (req, res) => {
 
     const users = await User.find(
       { _id: { $ne: userId } }, // exclude self
-      "username email profilePhoto",
+      "username email profilePhoto bio",
     );
 
     res.json(users);

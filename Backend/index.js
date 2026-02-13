@@ -60,7 +60,7 @@ io.on("connection", (socket) => {
       status: "sent"
     });
 
-    const populatedMsg = await Message.findById(msg._id).populate("sender", "username profilePhoto");
+    const populatedMsg = await Message.findById(msg._id).populate("sender", "username profilePhoto bio");
     io.to(data.chatId).emit("receiveMessage", populatedMsg);
   });
 

@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema({
   password : {type:String,required : true},
   profilePhoto : {type:String},
   bio : {type:String},
-  profileImg :{type:String},
+ 
   resetToken : {type : String},
   resetTokenExpires : {type : String}
 })
