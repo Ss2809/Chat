@@ -15,7 +15,7 @@ routes.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
-      return res.json({ message: "All fields required" });
+      return res.status(400).json({ success: false, message: "All fields required" });
     }
 
     const existingUser = await User.findOne({
@@ -24,13 +24,13 @@ routes.post("/signup", async (req, res) => {
 
     if (existingUser) {
       if (existingUser.email === email && existingUser.username === username) {
-        return res.json({ message: "Username and Email both already exist" });
+        return res.status(409).json({ success: false, message: "Username and Email both already exist" });
       }
       if (existingUser.email === email) {
-        return res.json({ message: "Email already exists" });
+        return res.status(409).json({ success: false, message: "Email already exists" });
       }
       if (existingUser.username === username) {
-        return res.json({ message: "Username already exists" });
+        return res.status(409).json({ success: false, message: "Username already exists" });
       }
     }
 
@@ -51,9 +51,9 @@ routes.post("/signup", async (req, res) => {
     const htmltmplate = otpTemplate(otp);
     const emailSent = await sendmail(email, subject, htmltmplate);
     if (!emailSent) {
-      return res.status(500).json({ message: "Failed to send OTP email" });
+      return res.status(500).json({ success: false, message: "Failed to send OTP email" });
     }
-    res.json({ message: "OTP sent to your email", otp });
+    res.json({ success: true, message: "OTP sent to your email" });
   } catch (err) {
     res.status(500).json({ message: "Server error", err });
   }
@@ -62,21 +62,22 @@ routes.post("/signup", async (req, res) => {
 routes.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
 
-  const record = await OTP.findOne({ email, otp });
+  const record = await OTP.findOne({ email, otp: Number(otp) });
 
   if (!record) {
-    return res.json({ message: "Invalid OTP" });
+    return res.status(400).json({ success: false, message: "Invalid OTP" });
   }
 
   if (record.expiresAt < Date.now()) {
-    return res.json({ message: "OTP expired" });
+    await OTP.deleteOne({ _id: record._id });
+    return res.status(400).json({ success: false, message: "OTP expired" });
   }
 
   const user = await User.create(record.tempUser);
 
   await OTP.deleteOne({ _id: record._id });
 
-  res.json({ message: "Account verified & created" });
+  res.json({ success: true, message: "Account verified & created" });
 });
 
 routes.post("/login", async (req, res) => {

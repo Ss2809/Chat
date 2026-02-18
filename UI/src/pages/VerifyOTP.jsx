@@ -20,13 +20,13 @@ export default function VerifyOTP() {
 
       alert(res.data.message);
 
-      if (res.data.message.includes("verified")) {
+      if (res.data.success) {
         localStorage.removeItem("verifyEmail");
-        window.location.href = "/";
+        navigate("/");
       }
     } catch (error) {
       console.error(error);
-      alert("Invalid OTP");
+      alert(error.response?.data?.message || "Invalid OTP");
     } finally {
       setLoading(false);
     }

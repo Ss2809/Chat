@@ -22,13 +22,13 @@ export default function Signup() {
 
       alert(res.data.message);
 
-      if (res.data.message.includes("OTP")) {
+      if (res.data.success) {
         localStorage.setItem("verifyEmail", email);
-        window.location.href = "/verify";
+        navigate("/verify");
       }
     } catch (error) {
       console.error(error);
-      alert("Signup failed");
+      alert(error.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
